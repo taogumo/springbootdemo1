@@ -1,0 +1,277 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>地图展示</title>
+    <link rel="stylesheet" type="text/css" href="../js/leaflet/leaflet.css"/>
+    <script type="text/javascript" src="../js/echarts.js"></script>
+    <script type="text/javascript" src="../js/leaflet/leaflet.js"></script>
+    <script type="text/javascript" src="../js/jquery-3.1.1.js"></script>
+    <script type="text/javascript" src="../js/leaflet/leaflet-heat.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            border: 1px;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map');
+    var osmUrl = 'http://192.168.2.241:8090/tiles/{z}/{x}/{y}.png';
+    osm = L.tileLayer(osmUrl, {
+        minZoom: 1, maxZoom: 15
+    });
+
+    map.setView([35.16931, 114.64783], 6)
+        .addLayer(osm);
+
+    var baseLayers = {
+        "高德地图": L.tileLayer('http://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+            subdomains: "1234"
+        }),
+        '高德影像': L.layerGroup([L.tileLayer('http://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', {
+            subdomains: "1234"
+        }), L.tileLayer('http://t{s}.tianditu.cn/DataServer?T=cta_w&X={x}&Y={y}&L={z}', {
+            subdomains: "1234"
+        })]),
+        'GeoQ灰色底图': L.tileLayer('http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}').addTo(map),
+
+        '自定义底图': L.tileLayer('http://192.168.2.241:8090/tiles/{z}/{x}/{y}.png').addTo(map)
+    };
+    var layercontrol = L.control.layers(baseLayers, {}, {
+        position: "topright"
+    }).addTo(map);
+
+
+    L.marker([35.19682, 114.67976]).addTo(map)
+        .bindPopup("<b>姓名：王超杰</b><br />描述：帅哥.").openPopup();
+
+    var polygon = L.polygon([
+        [34.89494, 113.35145],
+        [34.87015, 113.81837],
+        [34.66258, 113.84034],
+        [34.68065, 113.44209]
+    ]).addTo(map);
+
+
+    //自定义弹框（插入）
+    var content = L.DomUtil.create('p', 'custom-popup');
+    var popup = L.popup();
+
+/*
+    function onMapClick(e) {
+        /!* popup.setLatLng(e.latlng)
+             .setContent("You clicked the map at " + e.latlng.toString())
+             .openOn(map);*!/
+        var v = e.latlng.toString()
+        content.innerHTML = "<b id='b1'>" + v + "</b>" + "<br><b>请输入内容</b>" +
+            "<br><label title='名字' for='stuname' >名称：</label><input id='stuname'></input><br>" +
+            "<button title='确定'>确定</button>"
+
+        popup.setLatLng(e.latlng)
+            .setContent(content)
+            .openOn(map);
+
+    }
+*/
+
+    function insert() {
+        var name = $("#stuname").val()
+        var addr = $("#addr").val()
+        var remark = $("#remark").val()
+        var lng = $("#lngb1").text()
+        var lat = $("#latb1").text()
+        $.ajax({
+            type: "post", //GET或POST,
+            async: true, //默认设置为true，所有请求均为异步请求。
+            url: "/friend/insert",
+            data: {
+                name: name,
+                address: addr,
+                remark: remark,
+                lng: lng,
+                lat: lat
+            },
+            dataType: "json", //xml、html、script、jsonp、 json
+            success: function (data) {
+                if (data) {
+                    query()
+                }
+            },
+            error: function () {
+                alert("错误")
+            },
+        });
+    }
+    function onMapClick(e) {
+        var v = e.latlng.toString()
+        var lat = e.latlng.lat.toString()
+        var lng = e.latlng.lng.toString()
+        content.innerHTML = "<b>经度：</b><b id='lngb1'>" + lng + "</b>" + "<br/>" + "<b>纬度：</b><b id='latb1'>" + lat + "</b>" + "<br/>" +
+            "<br><label title='名字' for='stuname' >名称：</label><input id='stuname'></input><br>" +
+            "<br><label>家乡：</label><input id='addr'></input><br>" +
+            "<br><label>描述：</label><input id='remark'></input><br>" +
+            "<button title='确定' style='text-align: right;margin-left:160px;margin-top:10px' onclick=insert()>确定</button>"
+
+        popup
+            .setLatLng(e.latlng)
+            .setContent(content)
+            .openOn(map);
+
+    }
+    map.on('click', onMapClick);
+
+
+    //自定义弹框Echarts
+    var div = L.DomUtil.create('div');
+
+    var chart = echarts.init(div, '', {
+        width: 500,
+        height: 300
+    });
+
+    var option = {
+        title: {
+            text: '大数据全国城市平均薪资'
+        },
+        tooltip: {},
+        legend: {
+            data: ['工资']
+        },
+        xAxis: {
+            data: ["北京", "上海", "广州", "深圳", "杭州", "武汉"]
+        },
+        toolbox: {
+            show: true,
+            feature: {
+                mark: {show: true},
+                dataView: {show: true, readOnly: false},
+                magicType: {
+                    show: true,
+
+                    option: {
+                        funnel: {
+                            x: '25%',
+                            width: '50%',
+                            funnelAlign: 'left',
+                            max: 1548
+                        }
+                    }
+                },
+                restore: {show: true},
+                saveAsImage: {show: true}
+            }
+        },
+        yAxis: {},
+        series: [{
+            name: '薪资',
+            type: 'bar',
+            data: [25000, 26000, 20000, 20000, 24983, 18000]
+        }]
+    };
+    chart.setOption(option);
+
+    L.marker([34.87015, 113.81837]).addTo(map)
+        .bindPopup(div, {maxWidth: 500});
+
+
+    var redIcon = L.icon({
+        iconUrl: '/images/leaf-red.png',
+        shadowUrl: '/images/leaf-shadow.png',
+
+        iconSize: [38, 95], // size of the icon
+        shadowSize: [50, 64], // size of the shadow
+        iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+        shadowAnchor: [4, 62],  // the same for the shadow
+        popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var greenIcon = L.icon({
+        iconUrl: '/images/leaf-green.png',
+        shadowUrl: '/images/leaf-shadow.png',
+
+        iconSize: [38, 95], // size of the icon
+        shadowSize: [50, 64], // size of the shadow
+        iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+        shadowAnchor: [4, 62],  // the same for the shadow
+        popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    L.marker([34.68065, 113.44209], {icon: greenIcon}).addTo(map)
+        .bindPopup("<b>姓名：王超杰</b><br />描述：帅哥.").openPopup();
+
+    //图层组
+    var littleton = L.marker([35.96012, 110.3468], {icon: redIcon}).bindPopup('This is Littleton, CO.'),
+        denver = L.marker([35.81771, 117.11438], {icon: redIcon}).bindPopup('This is Denver, CO.'),
+        aurora = L.marker([31.65328, 116.9386], {icon: greenIcon}).bindPopup('This is Aurora, CO.'),
+        golden = L.marker([31.72806, 110.08313], {icon: greenIcon}).bindPopup('This is Golden, CO.');
+
+    var cities = L.layerGroup([littleton, denver]);
+    var citie1 = L.layerGroup([aurora, golden]);
+    var overlayMaps = {
+        "城市上角点": cities,
+        "城市下角点": citie1
+    };
+    L.control.layers({}, overlayMaps, {position: "topleft"}).addTo(map);
+
+    //动态查询
+    query();
+
+    function query() {
+        /* arrayName = new Array();
+         arrayValue = new Array()*/
+        $.ajax({
+            type: "get", //GET或POST,
+            async: true, //默认设置为true，所有请求均为异步请求。
+            url: "/friend/query",
+            data: {},
+            dataType: "json", //xml、html、script、jsonp、 json
+            success: function (data) {
+                var array = []
+                for (i in data) {
+                    var mark = L.marker([data[i].lat, data[i].lng], {icon: redIcon}).addTo(map)
+                        .bindPopup("<b>姓名：</b>" + data[i].name + "<br /><b>家乡：</b>" + data[i].address +
+                            "<br/><b>描述：</b>" + data[i].remark).openPopup();
+                    array.push(mark)
+                }
+                var friends = L.layerGroup(array);
+                var overlayMaps = {
+                    "朋友": friends
+                };
+                L.control.layers({}, overlayMaps, {position: "topleft"}).addTo(map);
+            },
+            error: function () {
+                alert("错误")
+            },
+        });
+    }
+    //热点图
+    showHeatmap()
+    function showHeatmap() {
+        $.ajax({
+            type: "get", //GET或POST,
+            async: true, //默认设置为true，所有请求均为异步请求。
+            url: "/friend/query",
+            data: {},
+            dataType: "json", //xml、html、script、jsonp、 json
+            success: function (data) {
+                var array = []
+                for (i in data) {
+                    array.push([data[i].lat, data[i].lng])
+                }
+                var heat = L.heatLayer(array,{radius: 25,max:180}).addTo(map);
+            },
+            error: function () {
+                alert("错误")
+            },
+        });
+    }
+
+    //插入
+
+
+</script>
+</body>
+</html>

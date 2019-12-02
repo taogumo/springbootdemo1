@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>VueDemo</title>
+    <script src="../js/vue.min.js"></script>
+    <script src="../js/axios.min.js"></script>
+    <script src="../js/vue-router.js"></script>
+</head>
+<body>
+<div id="app">
+    <p v-if="seen">{{name}},学习{{msg}}</p>
+    <div v-html="msg"></div>
+    {{5+5}}<br>
+    {{name.split('').reverse().join('')}}<br>
+    <a v-bind:href="url">百度一下</a><br>
+    <button @click="reverseName()">翻转字符串</button>
+    <input v-model="name"><br>
+    {{name | capitalize}}
+    <soft863 v-bind:passmsg="name"></soft863>
+
+    <soft863_1></soft863_1>
+    <soft863_2></soft863_2>
+    <div
+            v-for="site in info"
+    >
+        {{ site.name+'>'+site.remark }}
+    </div>
+</div>
+<div id="app1">
+    <p>{{name}},学习{{msg}}</p>
+    <soft863></soft863>
+    <soft863_1></soft863_1>
+    <soft863_2></soft863_2>
+</div>
+<script>
+    Vue.component("soft863", {
+        props: ['passmsg'],
+        template: '<h1>这是个自定义863的{{passmsg}}组件</h1>'
+
+    });
+    var temp = {template: '<h2>这是个第二个自定义863的组件</h2>'};
+    var temp2 = {template: '<h3>这是个第三个自定义863的组件</h3>'};
+    var vm = new Vue({
+            el: '#app',
+            data: {
+                name: 'soft863v',
+                msg: '<h1>hello vue</h1>',
+                seen: true,
+                url: 'https://www.baidu.com/',
+                vuemsg: 'vue.js',
+                info: null
+            },
+           /* data() {
+                return {
+                    info: null
+                }
+            },*/
+            methods: {
+                reverseName: function () {
+                    this.name = this.name.split('').reverse().join('')
+                }
+            },
+            filters: {
+                capitalize: function (v) {
+                    if (!v) return ''
+                    v = v.toString()
+                    return v.charAt(0).toUpperCase() + v.slice(1)
+                }
+            },
+            components: {
+                soft863_1: temp,
+                soft863_2: temp2
+            },
+            mounted() {
+                axios
+                    .get('/friend/query')
+                    .then(function (response) {
+                            this.info = response.data
+                        }
+                    )
+                    .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                    });
+            }
+
+
+        })
+    ;
+
+    new Vue({
+        el: '#app1',
+        data: {
+            name: 'soft863v',
+            msg: '<h1>hello vue</h1>'
+        }
+    })
+
+    // alert(vm.$data.name)
+</script>
+</body>
+</html>

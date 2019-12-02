@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/vue.min.js"></script>
+    <script src="../js/vue-router.js"></script>
+    <script src="../js/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+    <h1>朋友列表</h1>
+    <div v-for="(site,i) in info1">
+        {{ i}}{{ site.name}}
+        <!-- {{ site.name+'>'+site.remark }}-->
+    </div>
+    <p>{{msg}}</p>
+</div>
+
+<script type="text/javascript">
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                info1: [{}],
+                msg: 'ew'
+
+            }
+        },
+        mounted() {
+            axios
+                .get('/friend/query')
+                .then(function (response) {
+                        this.info1 = response.data
+
+                    for (var item in response.data) {
+                        // this.info = item
+                        this.info1.push(response.data[item])
+                    }
+                        var tempArray = this.info1;
+                        tempArray[0].name = "dd";
+                        this.info1 = tempArray;
+                        this.info1.push({"id": 1, "name": "hadoop111"})
+
+
+                    }
+                )
+
+                .catch(function (error) { // 请求失败处理
+                    console.log(error);
+                });
+        }
+    })
+</script>
+</body>
+</html>

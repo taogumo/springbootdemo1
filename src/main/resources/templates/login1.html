@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.springframework.org/schema/mvc">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo系统</title>
+    <!--<script type="text/javascript" th:src="@{js/jquery-3.1.1.js}"></script>-->
+    <script type="text/javascript" src="js/jquery-3.1.1.js"></script>
+</head>
+<!--<body style="background-image:url('/images/15.jpg');background-repeat:inherit">-->
+<body  style="background-image:url('/images/15.jpg');background-repeat:inherit">
+
+<form id="formid" action="/user/log12" method="post">
+    <div align="center" style="margin-top: 200px">
+        <table width="350" border="0.9">
+            <tr align=center>
+                <td>用户名</td>
+                <td><input type="text" name="username" id="username" value="admin"></td>
+            </tr>
+            <tr align=center>
+                <td>密 码</td>
+                <td><input type="password" name="password" id="password" value="1"></td>
+            </tr>
+            <tr align=center>
+                <td>验证码</td>
+                <td><input type="text" name="yanzheng"></td>
+            </tr>
+            <tr align=center>
+                <td colspan="2"><input type="submit" value="登 录"/> <input type="reset" value="重 置"/>
+                    <button type="button" onclick="login1()">确定</button></td>
+            </tr>
+        </table>
+        <br>
+        <span th:text="${msg}">hello</span>
+    </div>
+
+</form>
+
+
+<script>
+    function login1() {
+        $.ajax({
+            type: "post", //GET或POST,
+            async:true, //默认设置为true，所有请求均为异步请求。
+            url: "/user/log",
+            data: {
+                username: $("#username").val(),
+                password: $("#password").val()
+            },
+            dataType: "json", //xml、html、script、jsonp、text
+            success: function(data) {
+                if(data.flag){
+                    window.location.href = "upload.html";
+                }
+                else
+                {
+                    alert(data.errorMsg)
+                }
+            },
+            error:function(){
+                alert("错误")
+            },
+        });
+    }
+</script>
+</body>
+</html>

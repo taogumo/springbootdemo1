@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello Thymeleaf</title>
+</head>
+<body>
+<div>
+    <span th:text="${title}"></span>
+    <br>
+    <span>访问 Model：</span><span th:text="${user.getUsername()}"></span>
+</div>
+<div>
+    <span>访问列表</span>
+    <table>
+        <thead>
+        <tr>
+            <th>姓名</th>
+            <th>年龄</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${userList.size()} eq 0">
+            <td colspan="3">没有用户信息！！</td>
+        </tr>
+        <tr th:each="item : ${userList}">
+            <td th:text="${item.getId()}"></td>
+            <td>
+                <a href="" th:href="@{'/user/query/' + ${item.getId()}}"
+                   th:text="${item.getUsername()}"></a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

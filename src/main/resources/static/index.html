@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试界面</title>
+</head>
+<script type="text/javascript" src="js/jquery-3.1.1.js"></script>
+<body>
+<h1 style="text-align: center" id="h">这是个界面</h1>
+<script src="js/sea-debug.js"></script>
+<script>
+    seajs.config({
+        base: '/module',
+        debug: true,
+        charset: 'utf-8'
+    });
+   /* seajs.use('common/testc',function (m) {
+       m.start111();
+    });
+    // seajs.use('common/main')
+    seajs.use('common/testa', function (m) {
+         m.initUI();
+    })*/
+</script>
+</body>
+</html>
